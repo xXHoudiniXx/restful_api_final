@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "RESTful_API",
+  "main": "app.js",
+  "dependencies": {
+    "mongodb": "^3.1.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xXHoudiniXx/restful_api_final.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xXHoudiniXx/restful_api_final/issues"
+  },
+  "homepage": "https://github.com/xXHoudiniXx/restful_api_final#readme"
+}
