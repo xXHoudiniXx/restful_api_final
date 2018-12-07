@@ -1,144 +1,128 @@
-// call packages needed
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
+const express = require('express'); 
+const app = express(); 
+const mongoClient = require('mongodb').MongoClient; // initializes the mongodb library and gets a client object 
+
+mongoClient.connect("mongodb://omega.unasec.info:27017", function(err, client) { 
+
+const collection = client.db('amazon').collection('reviews'); 
+console.log("Welcome to mongoDB!..."); 
+if (!err) {
+    
+
+//get review 
+app.get('/review/:reviewid/', (req, res) => { 
+collection.find({ }.pretty().limit(1)).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+})});
 
 
-//app config
+//random reviews by stars 
+app.get('/review/:n/:stars', (req, res) => { 
+collection.find({review: {star_rating: 3} }.limit(1)).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+})});
 
 
-// body parser config
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+//random reviews by date 
+app.get('/review/:n/:from_date/:to_date', (req, res) => { 
+collection.find(({review: {date : ISODate("2014-03-30T00:00:00Z")} }).limit(1).skip(450).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+}))});
 
-var port = process.env.PORT || 8080; // set port to :8080
 
-//---------------------------------------------------------------
-// DATABASE SETUP---- Hardcoded as of now/ setting db up later
-//---------------------------------------------------------------
+//add review 
+app.put('/reviews/:reviewid', (req, res) => { 
+collection.insert({ 
+"_id" : ObjectId("4G5H2W4R55T6"), 
+"day" : 30, 
+"marketplace" : "US", 
+"customer_id" : "4445232", 
+"vine" : "N", 
+"verified_purchase" : "Y", 
+"review" : { 
+"id" : "T432WRE54G", 
+"headline" : "It's ok", 
+"body" : "For simple use, this computer is great, but it is somewhat slow", 
+"star_rating" : 3, 
+"date" : ISODate("2014-03-30T00:00:00Z") 
+}, 
+"product" : { 
+"id" : "C0430IGLOS", 
+"parent" : "555753777", 
+"title" : "Electronics", 
+"category" : "Computers" 
+}, 
+"votes" : { 
+"helpful_votes" : 3, 
+"total_votes" : 20 
+}})});
 
-//---------------------------------------------------------------
-// ROUTES FOR API----
-//---------------------------------------------------------------
-var router = express.Router(); // get express Router
-
-// middleware to use for all requests
-router.use(function(req, res, next) {
-// logging
-console.log('Something is happening.');
-next(); // make sure we go to the next routes
+} //if 
+(function(err, result) { 
+if (err) throw err; 
+console.log(result); 
+res.send(); 
 });
 
-// '/' Testing route @localhost/api
-app.get('/', function(req, res) {
-res.json({ message: 'YESS! welcome to my API! - Test 1 passes!' });
+
+//update review 
+app.put('/server/review/:reviewid', (req, res) => { 
+collection.update({_id : ObjectId("5bd0dcffe25a5350c21ff517")},{"verified_purchase" : "Y"})(function(err, result) { 
+if (err) throw err; 
+res.send("Review Updated"); 
+})});
+
+
+//delete review 
+app.put('/server/review/:reviewid', (req, res) => { 
+collection.delete({_id: ObjectId("2dfg45hfgd2398ij67")}).toArray(function(err, result){ 
+if (err) throw err; 
+console.log(result); 
+res.send(result); 
+res.send("Review Deleted"); 
+})});
+
+
+//average star review 
+app.get('/review/:from/:to', (req, res) => { 
+var db1 = db.db("amazon"); 
+db1.collection("reviews").aggregate( { 
+$unwind : "$review"}, {$group: { _id: $_id, AvgStar: { $avg: $review.star_rating } }} ).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+db.close(); 
+}) 
 });
 
-// '/' Testing route @localhost/api/reviews/:reviewsid
-// adding temp reviews 001 and 002(all reviews from '/reviews') until db connection
-app.get('/api/reviews', (req, res) => {
-res.json([
-{
-id: 001,
-review: "Love the service here!",
-n: 001,
-stars: 4,
-from_date: 2012-01-01,
-},
-{
-id: 002,
-review: "Love and Hate this service here!",
-n: 002,
-stars: 2,
-from_date: 2012-02-02,
-},
-{
-id: 003,
-review: "Hate the service here!",
-n: 003,
-stars: 4,
-from_date: 2013-01-01,
-}
-])
-})
-//temp-testing with /api/reviews/:reviewid --- a review by id test call /reviews/:reviewid-002
-app.get('/api/reviews/:reviewid', (req,res)=>{
-res.json([
-{
-id: 002,
-review: "Hate the service here!",
-n: 002,
-stars: 2,
-from_date: 2012-02-02,
-}
-])
-})
 
-//temp-testing with /api/reviews/:n/:stars --- a review by id testing call /reviews/:n[001+003]/:stars[4]
-app.get('/api/reviews/:n/:stars', (req,res)=>{
-res.json([
-{
-n: [id[001 + 003]],
-stars: 4,
-}
-])
+//average helpful votes 
+app.get('/review/helpful/:prodid', (req, res) => { 
+var db1 = db.db("amazon"); 
+db1.collection("reviews").aggregate( { 
+$unwind : "$votes"}, {$group: { _id: $_id, AvgVote: { $avg: $votes.helpful_votes } }} ).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+db.close(); 
+}) 
 });
-//temp-testing with /api/reviews/:reviewid/:n/:from_date/:end_date --- a review by id testing call /reviews/:reviewid-003/:n-3/:stars-4
-app.get('/api/reviews/:n/:from_date/:end_date', (req,res)=>{
-res.json([
-{
-n: [id[001 + 002 + 003]],
-from_date: 2013-01-01,
-end_date: 2012-01-01,
-}
-])
-})
-//temp-testing with /api/reviews --- posting new review at reviews
-app.post('/api/reviews', (req,res)=>{
-res.json([
-{
-id: 004,
-review: "Loving the service here!",
-n: 004,
-stars: 2,
-from_date: 2013-02-02,
-}
-])
-})
-//temp-testing with /api/reviews --- updating review at reviews/reviewid{004}
-app.put('/api/reviews', (req,res)=>{
-res.json([
-{
-id: 004,
-review: "The service here stinks!",
-n: 004,
-stars: 1,
-from_date: 2013-02-03,
-}
-])
-})
-//temp-testing with /api/reviews --- deleting review at reviews/reviewid{004}
-app.delete('/api/reviews', (req,res)=>{
-res.json([
-{
-id: 004,
-review: "The service here stinks!",
-n: 004,
-stars: 1,
-from_date: 2013-02-03,
-}
-])
-})
 
-// REGISTER ROUTES -------
-// /api is prefix...(all) routes
-app.use('/api', router);
-app.use('api/reviews', router);
-app.use('api/reviews/:reviewid', router);
-app.use('api/reviews/:n/:stars', router);
-app.use('api/reviews/:n/:from_date/:end_date', router);
 
-// START THE SERVER
-// =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port);
+//average review info by category 
+app.get('/review/info/:custid', (req, res) => { 
+var db1 = db.db("amazon"); 
+db1.collection("reviews").aggregate( { 
+$unwind : "$product"}, {$group: { _id: $_id, AvgCategory: { $avg: $product.category } }} ).toArray(function(err, result) { 
+if (err) throw err; 
+res.send(result); 
+db.close(); 
+}) 
+}); 
+
+for(var i = 0; i < results.length; i++) { 
+console.log(results[i])
+};
+});
+

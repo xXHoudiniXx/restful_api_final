@@ -1,4 +1,32 @@
 {
+<<<<<<<<< saved version
+
+=========
+<<<<<<< HEAD
+  "name": "restful_api",
+  "version": "1.0.0",
+  "description": "Final RESTful API",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:xXHoudiniXx/restful_api_final.git"
+  },
+  "author": "David Barrett <dbarrett@una.edu>",
+  "dependencies": {
+    "express": "~3.2.4"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "devDependencies": {},
+  "license": "ISC",
+  "bugs": {
+    "url": "git@github.com:xXHoudiniXx/restful_api_final.git"
+  },
+<<<<<<<<< saved version
+  "homepage": "https://github.com/xXHoudiniXx/restful_api_final/readme.md"
+=======
+>>>>>>>>> local version
   "name": "workspace",
   "version": "1.0.0",
   "description": "RESTful_API",
@@ -20,4 +48,12 @@
     "url": "https://github.com/xXHoudiniXx/restful_api_final/issues"
   },
   "homepage": "https://github.com/xXHoudiniXx/restful_api_final#readme"
+<<<<<<<<< saved version
+
+=========
+>>>>>>> f0b8ea7a845efe79ce70e18c6019fd8ef2b66d6f
+=========
+
+>>>>>>>>> local version
+>>>>>>>>> local version
 }
